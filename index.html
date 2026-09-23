@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MagicTap — Tap to click for Magic Mouse</title>
+<meta name="description" content="MagicTap lets your Magic Mouse click with a light tap. A free menu bar app for macOS.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='black'/><rect x='20' y='12' width='24' height='40' rx='12' fill='none' stroke='white' stroke-width='3'/><circle cx='32' cy='24' r='4' fill='white'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --white: #ffffff;
+    --grey-1: #f2f2f2;
+    --grey-2: #d9d9d9;
+    --grey-3: #767676;
+    --font: "Geist", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --max: 1080px;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *, *::before, *::after { box-sizing: inherit; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
+  body {
+    font-family: var(--font);
+    background: var(--white);
+    color: var(--black);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--black); outline-offset: 3px; }
+  .inverse :focus-visible { outline-color: var(--white); }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Navigation ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--grey-2);
+  }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; text-decoration: none; letter-spacing: -.01em; }
+  .brand svg { width: 28px; height: 28px; }
+  .nav ul { list-style: none; display: flex; gap: 28px; }
+  .nav ul a { text-decoration: none; font-size: 15px; color: var(--grey-3); transition: color .15s; }
+  .nav ul a:hover, .nav ul a.active { color: var(--black); }
+
+  /* ---------- Home ---------- */
+  .hero { padding: 96px 0 112px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: center; }
+  .logo-big { width: 88px; height: 88px; margin-bottom: 36px; }
+  h1 {
+    font-size: clamp(44px, 7vw, 84px);
+    line-height: .98;
+    letter-spacing: -.045em;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .lead { font-size: 19px; max-width: 30em; color: #222; margin-bottom: 36px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 24px;
+    border: 1.5px solid var(--black);
+    border-radius: 999px;
+    font: 500 15px/1 var(--font);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .btn-solid { background: var(--black); color: var(--white); }
+  .btn-solid:hover { background: var(--white); color: var(--black); }
+  .btn-line { background: transparent; color: var(--black); }
+  .btn-line:hover { background: var(--black); color: var(--white); }
+  .btn svg { width: 18px; height: 18px; }
+
+  /* App UI preview: real screenshot */
+  .shot {
+    display: flex; justify-content: center;
+    padding: 40px 24px;
+    background: var(--grey-1);
+    border: 1.5px solid var(--black);
+    border-radius: 14px;
+  }
+  .shot img {
+    width: 100%; max-width: 355px; height: auto;
+    border-radius: 12px;
+    box-shadow: 0 24px 48px -20px rgba(0,0,0,.4);
+  }
+  .caption { margin-top: 14px; font-size: 13px; color: var(--grey-3); text-align: center; }
+  /* ---------- Download ---------- */
+  .inverse { background: var(--black); color: var(--white); }
+  .download { padding: 112px 0; }
+  .download .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+  h2 { font-size: clamp(34px, 4.6vw, 52px); line-height: 1.05; letter-spacing: -.035em; font-weight: 600; margin-bottom: 20px; }
+  .download p.sub { color: #bdbdbd; max-width: 28em; margin-bottom: 36px; }
+  .inverse .btn-solid { background: var(--white); color: var(--black); border-color: var(--white); }
+  .inverse .btn-solid:hover { background: var(--black); color: var(--white); }
+  .inverse .btn-line { color: var(--white); border-color: var(--white); }
+  .inverse .btn-line:hover { background: var(--white); color: var(--black); }
+  .meta { margin-top: 20px; font-size: 14px; color: #8c8c8c; }
+  .specs { border-top: 1px solid #333; }
+  .specs div { display: flex; justify-content: space-between; gap: 24px; padding: 16px 0; border-bottom: 1px solid #333; font-size: 15px; }
+  .specs dt { color: #8c8c8c; }
+  .specs dd { text-align: right; }
+  .steps { margin-top: 40px; list-style: none; counter-reset: s; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 32px 1fr; padding: 6px 0; font-size: 15px; color: #d0d0d0; }
+  .steps li::before { content: counter(s); color: var(--white); font-weight: 600; }
+  .steps code { font-size: 13px; background: #1c1c1c; padding: 2px 6px; border-radius: 4px; }
+  .donate { margin-top: 72px; padding-top: 40px; border-top: 1px solid #333; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; }
+  .donate p { max-width: 32em; color: #bdbdbd; }
+  .donate strong { color: var(--white); font-weight: 600; }
+
+  /* ---------- About me ---------- */
+  .about { padding: 112px 0; }
+  .about .wrap { display: grid; grid-template-columns: 340px 1fr; gap: 72px; align-items: center; }
+  .photo {
+    aspect-ratio: 4 / 5;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--grey-1);
+    border: 1.5px solid var(--black);
+    position: relative;
+  }
+  .photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); }
+  .photo .ph {
+    position: absolute; inset: 0;
+    display: none; place-items: center;
+    font-size: 72px; font-weight: 600; letter-spacing: -.04em;
+  }
+  .photo.empty .ph { display: grid; }
+  .about p { max-width: 34em; margin-bottom: 18px; color: #222; }
+  .links { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 28px; }
+  .links a { font-weight: 500; text-underline-offset: 5px; text-decoration-thickness: 1.5px; }
+
+  footer { border-top: 1px solid var(--grey-2); padding: 28px 0; font-size: 14px; color: var(--grey-3); }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px) {
+    .hero { padding: 64px 0 80px; }
+    .hero .wrap, .download .wrap, .about .wrap { grid-template-columns: 1fr; gap: 48px; }
+    .about .wrap { gap: 40px; }
+    .photo { max-width: 320px; }
+    .download, .about { padding: 80px 0; }
+  }
+  @media (max-width: 480px) {
+    .nav ul { gap: 18px; }
+    .nav ul a { font-size: 14px; }
+    .brand span { display: none; }
+    .btn { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Logo reused in several places -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="currentColor"/>
+    <rect x="20" y="12" width="24" height="40" rx="12" fill="none" stroke="var(--logo-fg, #fff)" stroke-width="3"/>
+    <circle cx="32" cy="24" r="4" fill="var(--logo-fg, #fff)"/>
+    <circle cx="32" cy="24" r="8.5" fill="none" stroke="var(--logo-fg, #fff)" stroke-width="1.5" opacity=".45"/>
+  </symbol>
+</svg>
+
+<nav class="nav" aria-label="Main menu">
+  <div class="wrap">
+    <a href="#home" class="brand"><svg><use href="#logo"/></svg><span>MagicTap</span></a>
+    <ul>
+      <li><a href="#home" class="active">Home</a></li>
+      <li><a href="#download">Download</a></li>
+      <li><a href="#about">About me</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <!-- ================= HOME ================= -->
+  <section id="home" class="hero">
+    <div class="wrap">
+      <div>
+        <svg class="logo-big" role="img" aria-label="MagicTap logo"><use href="#logo"/></svg>
+        <h1>Just tap. It clicks.</h1>
+        <p class="lead">MagicTap lets your Magic Mouse click with a tap, no pressing needed. Tap with one finger to left-click, two fingers to right-click, and hold three fingers to drag. It&rsquo;s a small app that lives quietly in your Mac&rsquo;s menu bar.</p>
+        <div class="actions">
+          <a href="#download" class="btn btn-solid">Download for free</a>
+          <a href="#preview" class="btn btn-line">See how it looks</a>
+        </div>
+      </div>
+
+      <figure id="preview">
+        <div class="shot">
+          <img src="assets/magictap-gui.png" width="710" height="934" alt="MagicTap panel with toggles for tap to click, 1, 2 and 3-finger clicks, 3-finger drag, launch at login and run in background">
+        </div>
+        <figcaption class="caption">The MagicTap panel, opened from the menu bar.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= DOWNLOAD ================= -->
+  <section id="download" class="download inverse">
+    <div class="wrap">
+      <div>
+        <h2>Download MagicTap</h2>
+        <p class="sub">Free to use. One file works on every Mac, Apple Silicon or Intel.</p>
+        <div class="actions">
+          <!-- REPLACE href="" BELOW WITH YOUR .dmg DOWNLOAD LINK -->
+          <a href="" class="btn btn-solid" id="btn-download">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            Download for macOS
+          </a>
+        </div>
+        <p class="meta">MagicTap.dmg</p>
+
+        <ol class="steps">
+          <li><span>Open <code>MagicTap.dmg</code> and drag MagicTap into your Applications folder.</span></li>
+          <li><span>If macOS shows a warning, go to System Settings › Privacy &amp; Security and click Open Anyway.</span></li>
+          <li><span>Turn on Accessibility permission for MagicTap so your taps can send clicks.</span></li>
+        </ol>
+      </div>
+
+      <dl class="specs">
+        <div><dt>System</dt><dd>macOS</dd></div>
+        <div><dt>Processor</dt><dd>Apple Silicon &amp; Intel</dd></div>
+        <div><dt>Device</dt><dd>Apple Magic Mouse</dd></div>
+        <div><dt>Required permission</dt><dd>Accessibility</dd></div>
+        <div><dt>Price</dt><dd>Free</dd></div>
+      </dl>
+    </div>
+
+    <div class="wrap">
+      <div class="donate">
+        <p><strong>Enjoying MagicTap?</strong> A donation helps me keep maintaining and improving the app.</p>
+        <!-- REPLACE href="" BELOW WITH YOUR DONATION LINK (Ko-fi, Buy Me a Coffee, PayPal, etc.) -->
+        <a href="" class="btn btn-line" id="btn-donate">Donate</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT ME ================= -->
+  <section id="about" class="about">
+    <div class="wrap">
+      <!-- Save your photo in the assets folder as foto.jpg -->
+      <div class="photo" id="photo">
+        <img src="assets/foto.jpg" alt="Photo of the creator of MagicTap" onerror="this.remove(); document.getElementById('photo').classList.add('empty');">
+        <div class="ph" aria-hidden="true">NA</div>
+      </div>
+      <div>
+        <h2>About me</h2>
+        <p>Hi, I&rsquo;m [Your Name]. I built MagicTap because I wanted my Magic Mouse to feel as easy as a trackpad: just touch, without pressing down for every click.</p>
+        <p>[Write a little about yourself here, such as your work, your interests, or other projects you&rsquo;re working on.]</p>
+        <div class="links">
+          <a href="">GitHub</a>
+          <a href="">Instagram</a>
+          <a href="mailto:">Email</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year">2026</span> MagicTap</span>
+    <span>Made for Magic Mouse users</span>
+  </div>
+</footer>
+
+<script>
+  // Buttons with an empty link don't reload the page
+  ['btn-download', 'btn-donate'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('click', function (e) {
+      if (!el.getAttribute('href')) { e.preventDefault(); alert('This link hasn\'t been added yet.'); }
+    });
+  });
+
+  // Highlight the active menu item while scrolling
+  var links = document.querySelectorAll('.nav ul a');
+  var sections = ['home', 'download', 'about'].map(function (id) { return document.getElementById(id); });
+  function setActive() {
+    var y = window.scrollY + 120, current = 'home';
+    sections.forEach(function (s) { if (s.offsetTop <= y) current = s.id; });
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) current = 'about';
+    links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+  }
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
