@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MagicTap — Tap to click for Magic Mouse</title>
 <meta name="description" content="MagicTap lets your Magic Mouse click with a light tap. A free menu bar app for macOS.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='black'/><rect x='20' y='12' width='24' height='40' rx='12' fill='none' stroke='white' stroke-width='3'/><circle cx='32' cy='24' r='4' fill='white'/></svg>">
+<link rel="icon" type="image/png" href="assets/AppIcon.png">
+<link rel="apple-touch-icon" href="assets/AppIcon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -50,7 +51,7 @@
   }
   .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; text-decoration: none; letter-spacing: -.01em; }
-  .brand svg { width: 28px; height: 28px; }
+  .brand img { width: 28px; height: 28px; }
   .nav ul { list-style: none; display: flex; gap: 28px; }
   .nav ul a { text-decoration: none; font-size: 15px; color: var(--grey-3); transition: color .15s; }
   .nav ul a:hover, .nav ul a.active { color: var(--black); }
@@ -168,19 +169,9 @@
 </head>
 <body>
 
-<!-- Logo reused in several places -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="logo" viewBox="0 0 64 64">
-    <rect width="64" height="64" rx="14" fill="currentColor"/>
-    <rect x="20" y="12" width="24" height="40" rx="12" fill="none" stroke="var(--logo-fg, #fff)" stroke-width="3"/>
-    <circle cx="32" cy="24" r="4" fill="var(--logo-fg, #fff)"/>
-    <circle cx="32" cy="24" r="8.5" fill="none" stroke="var(--logo-fg, #fff)" stroke-width="1.5" opacity=".45"/>
-  </symbol>
-</svg>
-
 <nav class="nav" aria-label="Main menu">
   <div class="wrap">
-    <a href="#home" class="brand"><svg><use href="#logo"/></svg><span>MagicTap</span></a>
+    <a href="#home" class="brand"><img src="assets/AppIcon.png" alt=""><span>MagicTap</span></a>
     <ul>
       <li><a href="#home" class="active">Home</a></li>
       <li><a href="#download">Download</a></li>
@@ -194,7 +185,7 @@
   <section id="home" class="hero">
     <div class="wrap">
       <div>
-        <svg class="logo-big" role="img" aria-label="MagicTap logo"><use href="#logo"/></svg>
+        <img class="logo-big" src="assets/AppIcon.png" alt="MagicTap logo">
         <h1>Just tap. It clicks.</h1>
         <p class="lead">MagicTap lets your Magic Mouse click with a tap, no pressing needed. Tap with one finger to left-click, two fingers to right-click, and hold three fingers to drag. It&rsquo;s a small app that lives quietly in your Mac&rsquo;s menu bar.</p>
         <div class="actions">
